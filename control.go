@@ -394,7 +394,8 @@ func (c *controlConn) reconnect(refreshring bool) {
 		return
 	}
 
-	if refreshring {
+	// temporary
+	if refreshring && !c.session.cfg.DisableInitialHostLookup {
 		c.session.hostSource.refreshRing()
 	}
 }

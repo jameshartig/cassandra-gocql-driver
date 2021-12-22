@@ -166,16 +166,24 @@ func (s *Session) handleNodeEvent(frames []frame) {
 
 		switch f.change {
 		case "NEW_NODE":
-			s.handleNewNode(f.host, f.port)
+			if !s.cfg.Events.DisableTopologyEvents {
+				s.handleNewNode(f.host, f.port)
+			}
 		case "REMOVED_NODE":
-			s.handleRemovedNode(f.host, f.port)
+			if !s.cfg.Events.DisableTopologyEvents {
+				s.handleRemovedNode(f.host, f.port)
+			}
 		case "MOVED_NODE":
 		// java-driver handles this, not mentioned in the spec
 		// TODO(zariel): refresh token map
 		case "UP":
-			s.handleNodeUp(f.host, f.port)
+			if !s.cfg.Events.DisableNodeStatusEvents {
+				s.handleNodeUp(f.host, f.port)
+			}
 		case "DOWN":
-			s.handleNodeDown(f.host, f.port)
+			if !s.cfg.Events.DisableNodeStatusEvents {
+				s.handleNodeDown(f.host, f.port)
+			}
 		}
 	}
 }
