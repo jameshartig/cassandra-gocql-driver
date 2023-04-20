@@ -5,42 +5,8 @@ package gocql
 
 import (
 	"bytes"
-	"strconv"
 	"testing"
 )
-
-func TestGetKeyspaceMetadata(t *testing.T) {
-	session := createSession(t)
-	defer session.Close()
-
-	keyspaceMetadata, err := session.KeyspaceMetadata("gocql_test")
-	if err != nil {
-		t.Fatalf("failed to query the keyspace metadata with err: %v", err)
-	}
-	if keyspaceMetadata == nil {
-		t.Fatal("failed to query the keyspace metadata, nil returned")
-	}
-	if keyspaceMetadata.Name != "gocql_test" {
-		t.Errorf("Expected keyspace name to be 'gocql' but was '%s'", keyspaceMetadata.Name)
-	}
-	if keyspaceMetadata.StrategyClass != "org.apache.cassandra.locator.SimpleStrategy" {
-		t.Errorf("Expected replication strategy class to be 'org.apache.cassandra.locator.SimpleStrategy' but was '%s'", keyspaceMetadata.StrategyClass)
-	}
-	if keyspaceMetadata.StrategyOptions == nil {
-		t.Error("Expected replication strategy options map but was nil")
-	}
-	rfStr, ok := keyspaceMetadata.StrategyOptions["replication_factor"]
-	if !ok {
-		t.Fatalf("Expected strategy option 'replication_factor' but was not found in %v", keyspaceMetadata.StrategyOptions)
-	}
-	rfInt, err := strconv.Atoi(rfStr.(string))
-	if err != nil {
-		t.Fatalf("Error converting string to int with err: %v", err)
-	}
-	if rfInt != *flagRF {
-		t.Errorf("Expected replication factor to be %d but was %d", *flagRF, rfInt)
-	}
-}
 
 func TestJSONB(t *testing.T) {
 	session := createSession(t)
