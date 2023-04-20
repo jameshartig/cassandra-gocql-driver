@@ -175,3 +175,30 @@ jobs:
         run: |
           export JVM_EXTRA_OPTS="${{env.JVM_EXTRA_OPTS}}"
           go test -run=TestAuthentication -tags "${{ matrix.tags }} gocql_debug" -timeout=15s -runauth ${{ env.args }}
+  integration-yugabyte:
+    timeout-minutes: 10
+    needs:
+      - build
+    name: Integration Tests (Yugabyte)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ '1.19', '1.20' ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/cache@v2
+        id: gomod-cache
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Setup YugabyteDB cluster
+        uses: yugabyte/yugabyte-db-action@master
+        id: yb
+      - name: Integration tests
+        run: |
+          go test -tags "yugabyte gocql_debug" -timeout=5m -race ./...
